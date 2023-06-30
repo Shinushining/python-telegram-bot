@@ -22,7 +22,9 @@ pipeline {
                 }
                 failure {
                     echo 'FAIL'
-                    mail to: luczak.roza@gmail.com, subject: 'The Pipeline build failed'
+                    emailext body: "Pipeline build failed. Check the artifacts for details.",
+                                     subject: "Pipeline ${VERSION} failed",
+                                     to: "luczak.roza@gmail.com"
                 }
             }
         }
@@ -40,7 +42,9 @@ pipeline {
                 }
                 failure {
                     echo 'FAIL'
-                    mail to: luczak.roza@gmail.com, subject: 'The Pipeline tests failed'
+                    emailext body: "Pipeline tests failed. Check the artifacts for details.",
+                                     subject: "Pipeline ${VERSION} failed",
+                                     to: "luczak.roza@gmail.com"
                 }
             }
         }
@@ -62,7 +66,9 @@ pipeline {
                 }
                 failure {
                     echo 'FAIL'
-                    mail to: luczak.roza@gmail.com, subject: 'The Pipeline deploy failed'
+                    emailext body: "Pipeline deploy failed. Check the artifacts for details.",
+                                     subject: "Pipeline ${VERSION} failed",
+                                     to: "luczak.roza@gmail.com"
                 }
             }
         }
