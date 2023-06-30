@@ -5,7 +5,6 @@ pipeline {
         MINOR_VERSION = "1"
         BUILD_VERSION = sh(returnStdout: true, script: 'echo ${BUILD_NUMBER}').trim()
         VERSION = "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}"
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
 
     stages {
@@ -58,7 +57,7 @@ pipeline {
                 echo 'Pipeline deployment started...'
                 sh "DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml build --no-cache python_telegram_deploy > devops/deploylog.txt"
                 sh "DOCKER_TLS_VERIFY=0 docker tag python_telegram_deploy shinushining/python_telegram:${VERSION} >> devops/deploylog.txt"
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin >> devops/deploylog.txt'
+                sh 'echo password | docker login -u user --password-stdin >> devops/deploylog.txt'
                 sh "DOCKER_TLS_VERIFY=0 docker push shinushining/python_telegram:${VERSION} >> devops/deploylog.txt"
                 sh "DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml up -d python_telegram_deploy >> devops/deploylog.txt"
             }
