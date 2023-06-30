@@ -24,9 +24,7 @@ pipeline {
                     echo 'FAIL'
                     emailext body: "Pipeline build failed. Check the artifacts for details.",
                                      subject: "Pipeline ${VERSION} failed",
-                                     to: "luczak.roza@gmail.com",
-                                     attachLog: true,
-                                     attachmentsPattern: 'devops/*.txt'
+                                     to: "luczak.roza@gmail.com"
                 }
             }
         }
@@ -46,9 +44,7 @@ pipeline {
                     echo 'FAIL'
                     emailext body: "Pipeline tests failed. Check the artifacts for details.",
                                      subject: "Pipeline ${VERSION} failed",
-                                     to: "luczak.roza@gmail.com",
-                                     attachLog: true,
-                                     attachmentsPattern: 'devops/*.txt'
+                                     to: "luczak.roza@gmail.com"
                 }
             }
         }
@@ -72,9 +68,7 @@ pipeline {
                     echo 'FAIL'
                     emailext body: "Pipeline deploy failed. Check the artifacts for details.",
                                      subject: "Pipeline ${VERSION} failed",
-                                     to: "luczak.roza@gmail.com",
-                                     attachLog: true,
-                                     attachmentsPattern: 'devops/*.txt'
+                                     to: "luczak.roza@gmail.com"
                 }
             }
         }
