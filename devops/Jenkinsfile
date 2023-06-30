@@ -57,7 +57,7 @@ pipeline {
                 echo 'Pipeline deployment started...'
                 sh "DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml build --no-cache python_telegram_deploy > devops/deploylog.txt"
                 sh "DOCKER_TLS_VERIFY=0 docker tag python_telegram_deploy shinushining/python_telegram:${VERSION} >> devops/deploylog.txt"
-                sh 'echo haslo | docker login -u admin --password-stdin >> devops/deploylog.txt'
+                sh 'echo dckr_pat_Cv9DI9RjoRAa8xZ2U3hhcXZUePY | docker login -u shinushining --password-stdin >> devops/deploylog.txt'
                 sh "DOCKER_TLS_VERIFY=0 docker push shinushining/python_telegram:${VERSION} >> devops/deploylog.txt"
                 sh "DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml up -d python_telegram_deploy >> devops/deploylog.txt"
             }
