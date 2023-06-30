@@ -1,0 +1,27 @@
+version: "3.9.16"
+services:
+  python_telegram:
+    image: python_telegram:latest
+    volumes:
+      - ./logs:/logs
+    build: 
+      context: .
+      dockerfile: build.Dockerfile
+  python_telegram_test:
+    image: python_telegram_test:latest
+    volumes:
+      - ./logs:/logs
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+    depends_on:
+      - python_telegram
+  python_telegram_deploy:
+    image: python_telegram_deploy:latest
+    build:
+      context: .
+      dockerfile: deploy.Dockerfile
+    depends_on:
+      - python_telegram
+volumes:
+  logs:

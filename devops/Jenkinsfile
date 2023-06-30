@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+    environment {
+        MAJOR_VERSION = "1"
+        MINOR_VERSION = "1"
+        BUILD_VERSION = sh(returnStdout: true, script: 'echo ${BUILD_NUMBER}').trim()
+        VERSION = "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Pipeline build started...'
+                sh 'DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml build --no-cache python_telegram > devops/buildlog.txt'
+            }
+            post {
+                always{
+                    archiveArtifacts(artifacts: 'devops/*.txt', fingerprint: true, followSymlinks: false)
+                }
+                success {
+                    echo 'SUCCESS'
+                }
+                failure {
+                    echo 'FAIL'
+                    emailext body: "Pipeline build failed. Check the artifacts for details.",
+                                     subject: "Pipeline ${VERSION} failed",
+                                     to: "luczak.roza@gmail.com",
+                                     attachLog: true,
+                                     attachmentsPattern: 'devops/*.txt'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Pipeline testing started...'
+                sh 'DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml build python_telegram_test > devops/testlog.txt'
+            }
+            post {
+                always{
+                    archiveArtifacts(artifacts: 'devops/*.txt', fingerprint: true, followSymlinks: false)
+                }
+                success {
+                    echo 'SUCCESS'
+                }
+                failure {
+                    echo 'FAIL'
+                    emailext body: "Pipeline tests failed. Check the artifacts for details.",
+                                     subject: "Pipeline ${VERSION} failed",
+                                     to: "luczak.roza@gmail.com",
+                                     attachLog: true,
+                                     attachmentsPattern: 'devops/*.txt'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Pipeline deployment started...'
+                sh "DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml build --no-cache python_telegram_deploy > devops/deploylog.txt"
+                sh "DOCKER_TLS_VERIFY=0 docker tag python_telegram_deploy shinushining/python_telegram:${VERSION} >> devops/deploylog.txt"
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin >> devops/deploylog.txt'
+                sh "DOCKER_TLS_VERIFY=0 docker push shinushining/python_telegram:${VERSION} >> devops/deploylog.txt"
+                sh "DOCKER_TLS_VERIFY=0 docker compose -f devops/docker-compose.yml up -d python_telegram_deploy >> devops/deploylog.txt"
+            }
+            post {
+                always{
+                    archiveArtifacts(artifacts: 'devops/*.txt', fingerprint: true, followSymlinks: false)
+                }
+                success {
+                    echo 'SUCCESS'
+                }
+                failure {
+                    echo 'FAIL'
+                    emailext body: "Pipeline deploy failed. Check the artifacts for details.",
+                                     subject: "Pipeline ${VERSION} failed",
+                                     to: "luczak.roza@gmail.com",
+                                     attachLog: true,
+                                     attachmentsPattern: 'devops/*.txt'
+                }
+            }
+        }
+    }
+}
