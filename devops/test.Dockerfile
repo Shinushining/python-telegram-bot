@@ -1,3 +1,3 @@
-FROM python_dockerfile
+FROM python_telegram
 
 RUN python -m pytest -m no_req
